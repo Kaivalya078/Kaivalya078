@@ -915,7 +915,11 @@ def write_readme(cfg: dict, data: dict):
     h = cfg["hero"]
 
     def img(name, alt, width="100%"):
-        return f'<img src="cards/{name}.svg" width="{width}" alt="{esc(alt)}">'
+        # The ?v= tag is a hash of the card, so the URL changes whenever the card
+        # does and GitHub's image cache can never serve a stale version.
+        import hashlib
+        v = hashlib.sha1((OUT / f"{name}.svg").read_bytes()).hexdigest()[:8]
+        return f'<img src="cards/{name}.svg?v={v}" width="{width}" alt="{esc(alt)}">'
 
     repo_names = {r["slug"]: "repo-" + r["slug"].split("/")[1].lower().replace("_", "-") for r in cfg.get("repos", [])}
     site = h.get("href") or "https://" + h["link"]
