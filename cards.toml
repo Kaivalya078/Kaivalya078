@@ -1,0 +1,131 @@
+# Everything the cards say lives here. Edit this file, then run
+#   python scripts/render_readme_cards.py
+# (or just push: the Action re-renders on every change to this file).
+
+user = "Kaivalya078"
+
+# Colours and type are taken from kaivalyapatel.dev (src/app/globals.css).
+[theme]
+paper = "#06070c"                      # card background, same as the site's pond
+raised = "rgba(255,255,255,0.03)"     # inset boxes
+grid = "rgba(255,255,255,0.028)"      # the faint cell grid behind everything
+rule = "rgba(255,255,255,0.08)"       # hairlines
+rule_strong = "rgba(255,255,255,0.16)"
+ink = "#e9e6df"                        # primary text, warm off-white
+ink_2 = "#aeacb3"                      # secondary
+ink_3 = "#85848e"                      # meta and labels
+accent = "#e5622f"                     # between kohaku red and koi orange
+koi_red = "#de4228"
+koi_cream = "#f4f0e6"
+koi_orange = "#ec7c2c"
+koi_slate = "#5c6070"
+
+[hero]
+name = "Kaivalya Patel"
+meta = "AI / ML Engineer · Ahmedabad, India"
+line = "Building practical AI systems: retrieval-augmented generation, backend ML and computer vision."
+link = "kaivalyapatel.dev"
+href = "https://www.kaivalyapatel.dev"
+# "koi" draws the site's ASCII koi. A path such as "assets/portrait.jpg" turns
+# that photo into an ASCII portrait instead. "" leaves the right side empty.
+portrait = "koi"
+
+# Three linked tiles. PLACEHOLDERS: swap these for the real tiles later.
+[[tiles]]
+label = "Website"
+title = "kaivalyapatel.dev"
+text = "Experience, projects and write-ups."
+href = "https://www.kaivalyapatel.dev"
+
+[[tiles]]
+label = "Kaggle"
+title = "Top 11%"
+text = "XGBoost and LightGBM ensemble in a Kaggle competition."
+href = "https://www.kaggle.com/kaivalya78"
+
+[[tiles]]
+label = "LinkedIn"
+title = "Kaivalya Patel"
+text = "Experience, education and contact."
+href = "https://www.linkedin.com/in/kaivalya-patel-333a86321/"
+
+# One card per featured repo. `visual` picks the drawing on the right:
+# "pipeline", "laps" or "hand".
+[[repos]]
+slug = "Kaivalya078/Cognifin"
+kicker = "Financial RAG system"
+title = "FinSightAI / Cognifin"
+description = "Question answering over Indian financial documents, where every answer is grounded in cited evidence from the source PDFs."
+stats = [["287K+", "chunks indexed"], ["200–600ms", "query latency"]]
+stack = ["FastAPI", "FAISS", "BM25", "sentence-transformers", "React"]
+visual = "pipeline"
+
+[[repos]]
+slug = "Kaivalya078/RaceOS"
+kicker = "F1 telemetry analytics"
+title = "RaceOS"
+description = "Race pace, tyre wear, sectors and strategy, built on ingested FastF1 telemetry behind an async API."
+stats = [["0.277s", "lap-time MAE"], ["1,086", "race laps modelled"]]
+stack = ["Python", "FastAPI", "PostgreSQL", "XGBoost", "React"]
+visual = "laps"
+
+[[repos]]
+slug = "Kaivalya078/SignScribe_v2"
+kicker = "Real-time ASL recognition"
+title = "SignScribe"
+description = "American Sign Language alphabet recognition that classifies hand landmarks rather than raw pixels, so it stays fast and robust to lighting."
+stats = [["96%", "accuracy, 29 classes"], ["<5ms", "inference"]]
+stack = ["PyTorch", "MediaPipe", "OpenCV", "NumPy"]
+visual = "hand"
+
+# Oldest first. Add the next entry at the end and the line extends to it.
+[[experience]]
+company = "Petpooja"
+title = "Data Science Intern"
+period = "Jul 2025 – Dec 2025"
+
+[[experience]]
+company = "Bit01 Techplode"
+title = "Data Science Intern"
+period = "Jan 2026 – Jun 2026"
+
+[[stack]]
+group = "Languages"
+items = ["Python", "SQL", "JavaScript", "TypeScript"]
+
+[[stack]]
+group = "ML & AI"
+items = ["PyTorch", "scikit-learn", "XGBoost", "LightGBM", "OpenCV", "MediaPipe", "FAISS", "BM25", "sentence-transformers"]
+
+[[stack]]
+group = "Backend & Web"
+items = ["FastAPI", "React", "SQLAlchemy", "Pydantic", "REST APIs"]
+
+[[stack]]
+group = "Data & Tools"
+items = ["PostgreSQL", "MySQL", "AWS", "Git"]
+
+# Plain text links at the bottom of the README, like the site's socials.
+[[links]]
+label = "Website"
+href = "https://www.kaivalyapatel.dev"
+
+[[links]]
+label = "LinkedIn"
+href = "https://www.linkedin.com/in/kaivalya-patel-333a86321/"
+
+[[links]]
+label = "Kaggle"
+href = "https://www.kaggle.com/kaivalya78"
+
+[[links]]
+label = "Email"
+href = "mailto:kaivalya.patel2004@gmail.com"
+
+[[links]]
+label = "X"
+href = "https://x.com/12hrscreentime"
+
+[[links]]
+label = "Instagram"
+href = "https://www.instagram.com/kaivalyapatel_078/"
