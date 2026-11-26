@@ -53,12 +53,16 @@ href = "https://www.linkedin.com/in/kaivalya-patel-333a86321/"
 # "pipeline", "laps" or "hand".
 [[repos]]
 slug = "Kaivalya078/Cognifin"
+live = "https://cognifin-eight.vercel.app"   # when set, the card links here and shows a LIVE marker
 kicker = "Financial RAG system"
-title = "FinSightAI / Cognifin"
-description = "Question answering over Indian financial documents, where every answer is grounded in cited evidence from the source PDFs."
-stats = [["287K+", "chunks indexed"], ["200–600ms", "query latency"]]
-stack = ["FastAPI", "FAISS", "BM25", "sentence-transformers", "React"]
+title = "Cognifin"
+description = "Ask questions about India's 100 largest listed companies. Every answer cites the annual-report page it came from, and headline figures are checked against the filings."
+stats = [["0.93", "answer correctness"], ["1.00", "citation validity"], ["4.9s", "p50 latency"]]
+stack = ["FastAPI", "LanceDB", "DuckDB", "ONNX Runtime", "React"]
 visual = "pipeline"
+# The pipeline drawing, one row per step; two names in a row draw side by side.
+# The travelling query follows the last box in each row.
+pipeline = [["question"], ["query understanding"], ["financials table", "hybrid + rerank"], ["citation check"], ["answer + page cites"]]
 
 [[repos]]
 slug = "Kaivalya078/RaceOS"
