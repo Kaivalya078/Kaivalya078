@@ -577,20 +577,26 @@ def render_tiles(cfg: dict) -> list[str]:
 # ---------------------------------------------------------------------------
 
 
-def draw_pipeline(card: Card, x0: float, y0: float, w: float, h: float):
+DEFAULT_PIPELINE = [["query"], ["retrieve"], ["rerank"], ["answer"]]
+
+
+def draw_pipeline(card: Card, x0: float, y0: float, w: float, h: float, rows=None):
     t = card.t
     face = FACES[("mono", 400)]
-    rows = [["query"], ["multi-query"], ["FAISS", "BM25"], ["rerank"], ["cited answer"]]
-    bh, gap = 24, (h - 5 * 24) / 4
+    rows = rows or DEFAULT_PIPELINE
+    n = len(rows)
+    bh, gap = 24, (h - n * 24) / max(n - 1, 1)
     cx = x0 + w / 2
     boxes = []
     for r, names in enumerate(rows):
         y = y0 + r * (bh + gap)
-        bw = 100 if len(names) == 2 else max(130, face.width(names[0], 11.5) + 36)
-        span = len(names) * bw + (len(names) - 1) * 18
+        widths = [max(100 if len(names) > 1 else 130, face.width(nm, 11.5) + 28) for nm in names]
+        span = sum(widths) + (len(names) - 1) * 18
         row_boxes = []
+        bx = cx - span / 2 - 18
         for k, label in enumerate(names):
-            bx = cx - span / 2 + k * (bw + 18)
+            bw = widths[k]
+            bx += (widths[k - 1] if k else 0) + 18
             final = r == len(rows) - 1
             stroke = t["accent"] if final else t["rule_strong"]
             card.add(f'<rect x="{bx:.1f}" y="{y:.1f}" width="{bw:.1f}" height="{bh}" rx="5" fill="{t["raised"]}" '
@@ -607,7 +613,12 @@ def draw_pipeline(card: Card, x0: float, y0: float, w: float, h: float):
                          f'fill="none" stroke="{t["rule_strong"]}" pathLength="1" stroke-dasharray="1"{card.anim("draw", 0.45 + r * 0.12, 0.4)}/>')
     # a query travelling through the pipeline, looping quietly
     if not STATIC:
-        path = f"M{cx:.1f} {y0 + bh:.1f} V{y0 + 2 * (bh + gap):.1f} H{boxes[2][0][0]:.1f} V{y0 + 3 * (bh + gap):.1f} H{cx:.1f} V{y0 + 4 * (bh + gap):.1f}"
+        # route through the last box of each row (the main retrieval path)
+        pts = [(row[-1][0], row[-1][1]) for row in boxes]
+        path = f"M{pts[0][0]:.1f} {pts[0][1] + bh:.1f}"
+        for (ax, ay), (bx, by) in zip(pts, pts[1:]):
+            mid = ay + bh + gap / 2
+            path += f" V{mid:.1f} H{bx:.1f} V{by:.1f}"
         begin = card.base + 1.3
         card.add(f'<circle r="3" fill="{t["accent"]}" class="motion" opacity="0">'
                  f'<set attributeName="opacity" to="1" begin="{begin:.2f}s"/>'
@@ -709,7 +720,10 @@ def render_repos(cfg: dict, data: dict) -> list[str]:
 
         # headline numbers
         sx = x
-        for k, (value, label) in enumerate(repo.get("stats", [])[:2]):
+        for k, (value, label) in enumerate(repo.get("stats", [])[:3]):
+            need = max(FACES[("mono", 500)].width(value, 22), FACES[("mono", 400)].width(label, 11))
+            if sx + need > x + 460:
+                break
             card.counter(sx, 186, value, delay=0.35 + k * 0.1, size=22)
             card.text(sx, 204, label, font="mono", size=11, fill=t["ink_3"], attrs=card.anim("fade", 0.4 + k * 0.1))
             sx += max(FACES[("mono", 500)].width(value, 22), FACES[("mono", 400)].width(label, 11)) + 36
@@ -717,13 +731,29 @@ def render_repos(cfg: dict, data: dict) -> list[str]:
         # stack and live repo stats along the bottom
         meta = " · ".join(repo.get("stack", []))
         info = data.get("repos", {}).get(repo["slug"])
-        if info:
+        if repo.get("live"):
+            host = re.sub(r"^https?://|/$", "", repo["live"])
+            tw = FACES[("mono", 400)].width(host, 11)
+            card.text(W - 40, 236, host, font="mono", size=11, fill=t["ink_2"], anchor="end", attrs=card.anim("fade", 0.6))
+            card.text(W - 52 - tw, 236, "LIVE", font="mono", size=10.5, fill=t["accent"], anchor="end", tracking=0.08,
+                      attrs=card.anim("fade", 0.6))
+            pulse = "" if STATIC else ' class="motion"'
+            card.add(f'<circle cx="{W - 52 - tw - FACES[("mono", 400)].width("LIVE", 10.5, 0.08) - 9:.1f}" cy="232.5" r="3" fill="{t["accent"]}"{card.anim("pop", 0.6)}/>')
+            if not STATIC:
+                card.add(f'<circle cx="{W - 52 - tw - FACES[("mono", 400)].width("LIVE", 10.5, 0.08) - 9:.1f}" cy="232.5" r="3" fill="none" '
+                         f'stroke="{t["accent"]}" class="motion"><animate attributeName="r" values="3;8" dur="2.4s" begin="{card.base + 1.5:.2f}s" repeatCount="indefinite"/>'
+                         f'<animate attributeName="opacity" values=".7;0" dur="2.4s" begin="{card.base + 1.5:.2f}s" repeatCount="indefinite"/></circle>')
+        elif info:
             bits = [f'★ {info["stars"]}'] + ([info["language"]] if info.get("language") else [])
             right = "  ".join(bits)
             card.text(W - 40, 236, right, font="mono", size=11, fill=t["ink_3"], anchor="end", attrs=card.anim("fade", 0.6))
         card.text(x, 236, meta, font="mono", size=11, fill=t["ink_3"], attrs=card.anim("fade", 0.55))
         card.add(f'<line x1="{x}" y1="218.5" x2="{W - 40}" y2="218.5" stroke="{t["rule"]}"{card.anim("fade", 0.5)}/>')
-        VISUALS[repo.get("visual", "pipeline")](card, 540, 24, 320, 176)
+        draw = VISUALS[repo.get("visual", "pipeline")]
+        if draw is draw_pipeline:
+            draw(card, 540, 24, 320, 176, repo.get("pipeline"))
+        else:
+            draw(card, 540, 24, 320, 176)
         names.append(card.save())
     return names
 
@@ -934,7 +964,7 @@ def write_readme(cfg: dict, data: dict):
         out.append(f'  <a href="{esc(tile["href"])}">{img(f"tile-{i + 1}", tile["label"] + ": " + tile["title"], "32.5%")}</a>')
     out += ["</p>", ""]
     for r in cfg.get("repos", []):
-        out += [f'<a href="https://github.com/{r["slug"]}">{img(repo_names[r["slug"]], r["title"] + ": " + r["description"])}</a>', ""]
+        out += [f'<a href="{r.get("live") or "https://github.com/" + r["slug"]}">{img(repo_names[r["slug"]], r["title"] + ": " + r["description"])}</a>', ""]
     out += [
         img("timeline", "Experience: " + ", ".join(f'{e["title"]}, {e["company"]} ({e["period"]})' for e in cfg.get("experience", []))),
         "",
